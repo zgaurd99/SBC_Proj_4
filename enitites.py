@@ -7,6 +7,7 @@ class Entity:
         self.rect = pygame.Rect(x, y, width, height)
         self.health = health
         self.alive = True
+        self.height_offset = 0
 
     def move(self, dx, dy):
         length = math.hypot(dx, dy)
@@ -72,14 +73,26 @@ class Player(Entity):
         )
 
 class Enemy(Entity):
-    def __init__(self, x, y, width, height, speed, health):
-        super().__init__(x, y, width, height, speed, health)
-    
-    def update(self, target_x, target_y):
-        dx = target_x - (self.x + self.size // 2)
-        dy = target_y - (self.y + self.size // 2)
+    def __init__(self, x, y, config):
+        super().__init__(
+            x, y,
+            config["width"],
+            config["height"],
+            config["speed"],
+            config["health"]
+        )
+        self.hit_cooldown = config["hit_cooldown"]
+        self.last_hit_time = 0
+        
+        self.separation_radius = config["separation_radius"]
 
+        self.gauage_cost = config["gauge_cost"]
+    
+    def update(self, target_rect):
+        dx = target_rect.centerx - self.rect.centerx
+        dy = target_rect.centery - self.rect.centery
         self.move(dx, dy)
+
     
     def draw(self, screen, camera_x, camera_y):
-        pygame.draw.rect(screen, camera_x, camera_y, (200, 50, 50))
+        super().draw(screen, camera_x, camera_y, (200, 50, 50))
