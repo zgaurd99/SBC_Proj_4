@@ -2,11 +2,11 @@ import pygame
 import math
 
 class Enemy:
-    def __init__(self, x, y, size=30, speed=2):
-        self.x = x
-        self.y = y
-        self.size = size
+    def __init__(self, x, y,width, height, speed):
+        self.width = width
+        self.height = height
         self.speed = speed
+        self.rect = pygame.Rect(x, y, width, height)
     
     def update(self, target_x, target_y):
         dx = target_x - (self.x + self.size // 2)
@@ -20,7 +20,7 @@ class Enemy:
         self.x += dx * self.speed
         self.y += dy * self.speed
     
-    def draw(self, screen):
+    def draw(self, screen, camera_x):
         pygame.draw.rect(
             screen,
             (200, 50, 50),

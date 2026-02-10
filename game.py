@@ -2,14 +2,12 @@ import pygame
 import sys
 import random
 
-from player import Player
-from enemy import Enemy
+from enitites import Player, Enemy
 
 # initailizes window elements
 pygame.init()
 clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 36)
-
 width = 800
 height = 600
 screen = pygame.display.set_mode((width, height))
@@ -19,9 +17,10 @@ pygame.display.set_caption("First Game")
 player = Player(
     width // 2 - 20,
     height // 2 - 20,
-    size=40,
-    speed=5
+    20, 20, 5, 100
 )
+
+start_time = pygame.time.get_ticks()
 
 # damage prevention window
 damage_cooldown = 1000
@@ -32,12 +31,19 @@ enemies = []
 spawn_timer = 0
 spawn_delay = 60
 
+# camera co-ordinates
+camera_x = 0
+camera_y = 0
+
 # running logic
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    camera_x = player.rect.centerx - width // 2
+    camera_y = player.rect.centery - height // 2
 
     spawn_timer += 1
     if spawn_timer >= spawn_delay:
@@ -110,7 +116,17 @@ while running:
         health_colour = (255, 0, 0)
     health_text = font.render(f"Health: {player.health}", True, health_colour)
 
+    elapsed_time = (current_time - start_time) // 1000
+
+    minutes = elapsed_time // 60
+    seconds = elapsed_time % 60
+
+    time_text = font.render(f"Time : {minutes:02d}:{seconds:02d}",
+                            True,
+                            (255, 255, 255))
+
     screen.blit(health_text, (10, 10))
+    screen.blit(time_text, (width - 150, 10))
 
     pygame.display.flip()
     clock.tick(60)
