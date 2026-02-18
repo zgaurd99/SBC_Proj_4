@@ -5,8 +5,8 @@ ENEMY_TYPES = {
         "speed": 2,
         "health": 3,
         "hit_cooldown": 1000,
-        "separation_radius": 25,
         "gauge_cost": 1,
+        "recoil_strength": 5
     },
     "fast": {
         "width": 20,
@@ -14,8 +14,8 @@ ENEMY_TYPES = {
         "speed": 4,
         "health": 1,
         "hit_cooldown": 500,
-        "separation_radius": 18,
         "gauge_cost": 2,
+        "recoil_strength": 7
     },
     "tank": {
         "width": 45,
@@ -23,7 +23,7 @@ ENEMY_TYPES = {
         "speed": 1,
         "health": 10,
         "hit_cooldown": 1500,
-        "separation_radius": 35,
         "gauge_cost": 3,
+        "recoil_strength": 10
     }
 }
