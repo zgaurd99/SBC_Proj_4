@@ -2,15 +2,23 @@ import pygame
 import math
 
 class Entity:
-    def __init__(self, x, y, width, height, speed, health,
-                 core_radius = None, recoil_strength = 0):
-        self.speed = speed
+    def __init__(self, x, y, width, height,
+                 speed, health, defense,
+                 rigidity,
+                 core_radius = None, 
+                 ):
         self.rect = pygame.Rect(x, y, width, height)
-        self.core_radius = min(width, height) // 2 if core_radius is None else core_radius
+        
+        self.speed = speed
         self.health = health
+        self.defense = defense
+        self.rigidity = rigidity
+        
+        self.core_radius = min(width, height) // 2 if core_radius is None else core_radius
+        
         self.alive = True
         self.height_offset = 0
-        self.recoil_strength = recoil_strength
+        
         self.vel_x = 0
         self.vel_y = 0
         self.knockback_decay = 0.85
