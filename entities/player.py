@@ -1,6 +1,7 @@
 import pygame
 
 from entity import Entity
+from core.state_machine import StateMachine
 
 class Player(Entity):
     def __init__(self, x, y, config):
@@ -14,42 +15,32 @@ class Player(Entity):
             rigidity = config["rigidity"] * config["boosts"][3]
         )
         
-        self.invulnerable_until = 0
-        self.invulnerability_duration = 300
+        self.invuln_timer = 0.0
+        self.invulnerability_duration = 0.3
 
         self.regen_time = config["regen_time"]
+        self.regen_timer = 0.0
         self.regen_amt = config["regen_amt"]
 
-    def update(self, keys,):
-        dx = 0
-        dy = 0
+        self.attack_machine = StateMachine("idle")
 
-        if keys[pygame.K_w]:
-            dy -= 1
-        if keys[pygame.K_s]:
-            dy += 1
-        if keys[pygame.K_a]:
-            dx -= 1
-        if keys[pygame.K_d]:
-            dx += 1
+    def update(self, delta_time):
+        self.attack_machine.update(delta_time)
+        self.passive_heal(delta_time)
 
-        self.move(dx, dy)
-
-        self.passive_heal()
-
-    def draw(self, screen, camera_x, camera_y):
-        pygame.draw.rect(
-            screen,
-            (255, 255, 255),
-            (self.rect.x - camera_x,
-             self.rect.y - camera_y,
-             self.rect.width,
-             self.rect.height
-            )
-        )
+    def draw(self, screen, camera, colour):
+        screen_rect = camera.apply(self.rect)
+        pygame.draw.rect(screen, (255, 255, 255), screen_rect)
     
-    def passive_heal(self):
-        self.regen_time -= 1
+    def passive_heal(self, delta_time):
+        if self.invuln_timer > 0:
+            self.invuln_timer -= delta_time
+            if self.invuln_timer < 0:
+                self.invuln_timer = 0.0
+        
 
-        if self.health < self.max_health and self.regen_time == 0:
-            self.health += self.regen_amt
+        if self.health < self.max_health:
+            self.regen_timer += delta_time
+            if self.regen_timer >= self.regen_time:
+                self.heal(self.regen_amt)
+                self.regen_timer = 0.0

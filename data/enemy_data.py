@@ -6,7 +6,7 @@ ENEMY_TYPES = {
         "health": 3,
         "defense": 1.0,
         "damage": 1,
-        "hit_cooldown": 1000,
+        "hit_cooldown": 1,
         "gauge_cost": 1,
         "rigidity": 5,
         "colour": (200, 50, 50)
@@ -18,7 +18,7 @@ ENEMY_TYPES = {
         "health": 1,
         "defense": 0.5,
         "damage": 2,
-        "hit_cooldown": 500,
+        "hit_cooldown": 0.5,
         "gauge_cost": 2,
         "rigidity": 7,
         "colour": (200, 50, 50)
@@ -30,7 +30,7 @@ ENEMY_TYPES = {
         "health": 10,
         "defense": 2.0,
         "damage": 3,
-        "hit_cooldown": 1500,
+        "hit_cooldown": 1.5,
         "gauge_cost": 3,
         "rigidity": 10,
         "colour": (200, 50, 50)

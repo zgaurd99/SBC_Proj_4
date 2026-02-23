@@ -14,23 +14,26 @@ class Enemy(Entity):
             config["rigidity"]
         )
         self.hit_cooldown = config["hit_cooldown"]
-        self.last_hit_time = -self.hit_cooldown
         self.gauage_cost = config["gauge_cost"]
         self.colour = config["colour"]
         self.damage = config["damage"]
 
-        self.stun_end_time = 0
-        self.stun_duration = 150
+        self.stun_timer = 0.0
+        self.stun_duration = 0.15
+
+        self.hit_timer = 0.0
     
-    def update(self, target_rect):
-        current_time = pygame.time.get_ticks()
+    def update(self, target_rect, delta_time):
+        if self.hit_timer > 0:
+                    self.hit_timer -= delta_time
 
-        if current_time < self.stun_end_time:
+        if self.stun_timer > 0:
+            self.stun_timer -= delta_time
             return
-
+        
         dx = target_rect.centerx - self.rect.centerx
         dy = target_rect.centery - self.rect.centery
         self.move(dx, dy)
  
-    def draw(self, screen, camera_x, camera_y):
-        super().draw(screen, camera_x, camera_y, self.colour)
+    def draw(self, screen, camera):
+        super().draw(screen, camera, self.colour)

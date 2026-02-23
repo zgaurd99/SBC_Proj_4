@@ -1,8 +1,9 @@
 import math
+import pygame
 
 def distance_sq(x1, y1, x2, y2):
     """
-    Basic ditance math
+    Basic distance math
     """
     dx = x2 - x1
     dy = y2 - y1
@@ -77,5 +78,4 @@ def apply_impulse(entity, nx, ny, strength):
     """
     Applies velocity impulse in direction (nx, ny) for smoother animation.
     """
-    entity.vel_x += nx * strength
-    entity.vel_y += ny * strength
+    entity.velocity += pygame.Vector2(nx, ny) * strength

@@ -2,7 +2,7 @@ import pygame
 
 from core.physics import circle_overlap, normalize, apply_impulse
 
-def damage_system(player,enemies, current_time):
+def damage_system(player,enemies, delta_time):
     """
     Handles player taking contact damage from enemies.
     """
@@ -11,28 +11,41 @@ def damage_system(player,enemies, current_time):
 
         #makes it so the next part only runs if collision actually occurs
         if not circle_overlap(
-            player.rect.centerx, player.rect.centery, player.core_raadius,
+            player.rect.centerx, player.rect.centery, player.core_radius,
             enemy.rect.centerx, enemy.rect.centery, enemy.core_radius
         ):
             continue
         
         # skips ahead if player is invunerable at current frame
-        if current_time < player.invunerable_until:
+        if player.invuln_timer > 0:
             continue
             
         # skips to next enemy if current one is on attack cooldown
-        if current_time - enemy.last_hit_time < enemy.hit_cooldown:
+        if enemy.hit_timer > 0:
             continue
 
         player.take_damage(enemy.damage)
-        player.invunerable_until = current_time + player.invunerablility_duration
-        enemy.last_hit_time = current_time
+        enemy.hit_timer = enemy.hit_cooldown
+        player.invuln_timer = player.invulnerability_duration
+        enemy.last_hit_time = 0.0
 
-        dx = enemy.rect.centerex - player.rect.centerx
-        dy = enemy.rect.centerex - player.rect.centery
+        dx = enemy.rect.centerx - player.rect.centerx
+        dy = enemy.rect.centery - player.rect.centery
         nx, ny = normalize(dx, dy)
 
-        knockback_strength = player.contact_knockback
+        Rp = player.rigidity
+        Re = enemy.rigidity
+        base_force = 30
 
-        apply_impulse(player, -nx, -ny, knockback_strength)
-        apply_impulse(enemy, nx, ny )
+        Rt = Rp + Re
+
+        if Rt == 0:
+            return
+        
+        Wp = Re / Rt
+        We = Rp / Rt
+
+        apply_impulse(player, -nx, -ny, base_force * Wp)
+        apply_impulse(enemy, nx, ny, base_force * We)
+
+        enemy.stun_end_time = delta_time + enemy.stun_duratio

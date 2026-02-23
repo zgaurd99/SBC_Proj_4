@@ -27,9 +27,9 @@ class Entity:
 
         self.height_offset = 0
 
-        self.vel_x = 0
-        self.vel_y = 0
+        self.velocity = pygame.Vector2(0, 0)
         self.knockback_decay = 0.85
+        self.movement_multiplier = 1
 
     def move(self, dx, dy):
         length = math.hypot(dx, dy)
@@ -58,16 +58,17 @@ class Entity:
             self.alive = False
             self.on_death()
 
-    def draw(self, screen, camera_x, camera_y, color):
+    def draw(self, screen, camera, color):
+        render_rect = self.rect.copy()
+        render_rect.y -= self.height_offset
+
+        screen_rect = camera.apply(render_rect)
+
+
         pygame.draw.rect(
             screen,
             color,
-            (
-                self.rect.x - camera_x,
-                self.rect.y - camera_y,
-                self.rect.width,
-                self.rect.height
-            )
+            screen_rect
         )
 
     def on_death(self):
@@ -78,12 +79,16 @@ class Entity:
         if self.health > self.max_health:
             self.health = self.max_health
 
-    def stat(self, inc_id):
+    def stat(self, inc_id, inc_amt):
         if inc_id == 0:
-            self.speed *= self.initial_stats[0]
+            self.buffs[0] += inc_amt
+            self.speed = self.buffs[0] * self.initial_stats[0]
         elif inc_id == 1:
-            self.max_health *= self.initial_stats[1]
+            self.buffs[1] += inc_amt
+            self.max_health = self.buffs[1] * self.initial_stats[1]
         elif inc_id == 2:
-            self.defense *= self.initial_stats[2]
+            self.buffs[2] += inc_amt
+            self.defense = self.buffs[2] * self.initial_stats[2]
         elif inc_id == 3:
-            self.rigidity *= self.initial_stats[3]
+            self.buffs[3] += inc_amt
+            self.rigidity = self.buffs[3] * self.initial_stats[3]

@@ -5,45 +5,20 @@ class StateMachine:
 
     def __init__(self, initial_state):
         self.state = initial_state
-        self.state_start_time = 0
-        self.transitions = {}
+        self.time_in_state = 0.0
+        self.transitions = []
 
-    def add_transition(self, from_state, to_state, condition_func):
-        """
-        To change states and add transition logic
-        
-        :param from_state: Current State
-        :param to_state: Next State
-        :param condition_func: condition_func(machine, current_time) -> boolon
-        """
+    def add_transition(self, from_state, to_state, condition):
+        self.transitions.append((from_state, to_state, condition))
 
-        if from_state not in self.transitions:
-            self.transitions[from_state] = []
-        
-        self.transitions[from_state].append({
-            "to": to_state,
-            "condition": condition_func
-        })
+    def update(self, delta_time):
+        self.time_in_state += delta_time
 
-    def set_state(self, new_state, current_time):
-        """
-            changes the machine's state
-        """
-        self.state = new_state
-        self.state_start_time = current_time
-
-    def update(self, current_time):
-        """
-        Evaluates transitions for the current state.
-        """
-
-        if self.state not in self.transitions:
-            return
-    
-        for transition in self.transitions[self.state]:
-            if transition["condition"](self, current_time):
-                self.set_state(transition["to"], current_time)
+        for from_state, to_state, condition in self.transitions:
+            if self.state == from_state and condition(self):
+                self.set_state(to_state)
                 break
-        
-    def time_in_state(self, current_time):
-        return current_time - self.state_start_time
+
+    def set_state(self, new_state):
+        self.state = new_state
+        self.time_in_state = 0.0
