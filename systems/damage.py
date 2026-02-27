@@ -48,4 +48,4 @@ def damage_system(player,enemies, delta_time):
         apply_impulse(player, -nx, -ny, base_force * Wp)
         apply_impulse(enemy, nx, ny, base_force * We)
 
-        enemy.stun_end_time = delta_time + enemy.stun_duratio
+        enemy.stun_end_time = delta_time + enemy.stun_duration

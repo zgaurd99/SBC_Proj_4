@@ -9,7 +9,8 @@ ENEMY_TYPES = {
         "hit_cooldown": 1,
         "gauge_cost": 1,
         "rigidity": 5,
-        "colour": (200, 50, 50)
+        "colour": (200, 50, 50),
+        "stun_factor": 1.0
     },
     "fast": {
         "width": 20,
@@ -21,7 +22,8 @@ ENEMY_TYPES = {
         "hit_cooldown": 0.5,
         "gauge_cost": 2,
         "rigidity": 7,
-        "colour": (200, 50, 50)
+        "colour": (200, 50, 50),
+        "stun_facctor": 0.5
     },
     "tank": {
         "width": 45,
@@ -33,6 +35,7 @@ ENEMY_TYPES = {
         "hit_cooldown": 1.5,
         "gauge_cost": 3,
         "rigidity": 10,
-        "colour": (200, 50, 50)
+        "colour": (200, 50, 50),
+        "stun_factor": 2.0
     }
 }

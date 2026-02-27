@@ -1,35 +1,73 @@
 import pygame
 import math
+import random
+
+class Stats:
+    def __init__(self,base):
+        self.base = base
+        self.modifiers = []
+
+    def add_modifier(self, value, mod_type):
+        self.modifiers.append((value, mod_type))
+
+    def clear_modifiers(self):
+        self.modifiers.clear()
+
+    @property
+    def value(self):
+        total = self.base
+        percent = 0
+
+        for value, mod_type in self.modifiers:
+            if mod_type == "flat":
+                total += value
+            elif mod_type == "percent":
+                percent += value
+
+        return total * (1 + percent)
+
+class Entity_Stats_Component:
+    def __init__(self, config):
+        self.stats = {
+            "attack":           Stats(config["attack"]),
+            "health":           Stats(config["health"]),
+            "defense":          Stats(config["defense"]),
+            "speed":            Stats(config["speed"]),
+            "rigidity":         Stats(config["rigidity"]),
+            "attack_speed":     Stats(config["attack_speed"]),
+            "stun_factor":      Stats(config["stun_factor"]),
+            "stun_strength":    Stats(config["stun_strength"]),
+            "crit_chance":      Stats(config["crit_chance"]),
+            "crit_multiplier":  Stats(config["crit_multiplier"])
+        }
 
 class Entity:
-    def __init__(self, x, y,
-                 width, height,
-                 speed, health, defense,
-                 rigidity,
-                 core_radius = None,
-                 ):
+    def __init__(self, x, y, config, core_radius=None):
+        width = config["width"] if "width" in config else 50
+        height = config["height"] if "height" in config else 50
         
         self.rect = pygame.Rect(x, y, width, height)
         
-        self.speed = speed
-        self.health = health
-        self.defense = defense
-        self.max_health = self.health
-        self.rigidity = rigidity
-
-        self.initial_stats = [speed, health, defense, rigidity]
-
-        self.buffs = [1.0, 1.0, 1.0, 1.0]
+        #stats
+        self.stats = Entity_Stats_Component(config)
+        self.current_health = self.stats.stats["health"].value
 
         self.core_radius = min(width, height) // 2 if core_radius is None else core_radius
         
         self.alive = True
-
         self.height_offset = 0
 
         self.velocity = pygame.Vector2(0, 0)
         self.knockback_decay = 0.85
-        self.movement_multiplier = 1
+        self.stun_timer = 0.0
+        self.hit_timer = 0.0
+        
+    def get_stat(self, name):
+        return self.stats.stats[name].value
+
+    @staticmethod
+    def chance(percent):
+        return random.random() < percent
 
     def move(self, dx, dy):
         length = math.hypot(dx, dy)
@@ -38,23 +76,30 @@ class Entity:
             dy /= length
 
         # base movement
-        self.rect.x += dx * self.speed
-        self.rect.y += dy * self.speed
+        speed = self.stats.stats["speed"].value
+        self.rect.x += dx * speed
+        self.rect.y += dy * speed
 
         # knockback velocity
-        self.rect.x += self.vel_x
-        self.rect.y += self.vel_y
+        self.rect.x += int(self.velocity.x)
+        self.rect.y += int(self.velocity.y)
 
         # decay knockback
-        self.vel_x *= self.knockback_decay
-        self.vel_y *= self.knockback_decay
+        self.velocity.x *= self.knockback_decay
+        self.velocity.y *= self.knockback_decay
 
-    def take_damage(self, amount):
+    def take_damage(self, dealer : "Entity"):
         if not self.alive:
             return
 
-        self.health -= amount // (self.defense * self.buffs[2])
-        if self.health <= 0:
+        attack = dealer.get_stat("attack")
+        crit_chance = dealer.get_stat("crit_chance")
+        crit_multiplier = dealer.get_stat("crit_multiplier") if Entity.chance(crit_chance) else 1
+        defense = self.get_stat("defense")
+        
+        final_damage = max(1, (attack/defense) * crit_multiplier)
+        self.current_health -= final_damage
+        if self.current_health <= 0:
             self.alive = False
             self.on_death()
 
@@ -75,20 +120,5 @@ class Entity:
         pass
 
     def heal(self, amt):
-        self.health += amt
-        if self.health > self.max_health:
-            self.health = self.max_health
-
-    def stat(self, inc_id, inc_amt):
-        if inc_id == 0:
-            self.buffs[0] += inc_amt
-            self.speed = self.buffs[0] * self.initial_stats[0]
-        elif inc_id == 1:
-            self.buffs[1] += inc_amt
-            self.max_health = self.buffs[1] * self.initial_stats[1]
-        elif inc_id == 2:
-            self.buffs[2] += inc_amt
-            self.defense = self.buffs[2] * self.initial_stats[2]
-        elif inc_id == 3:
-            self.buffs[3] += inc_amt
-            self.rigidity = self.buffs[3] * self.initial_stats[3]
+        max_health = self.get_stat("health")
+        self.current_health = min(self.current_health + amt, max_health)

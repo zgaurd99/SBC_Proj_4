@@ -13,7 +13,7 @@ class MeleeAttack(BaseAbility):
         self.radius = 60
         self.damage = 3
         self.base_force = 35
-
+        
         self.lock_movement = True # Wheter player can move during the attack
 
         self._hit_targets = set() # To track which targets have already been hit during the active phase
@@ -27,50 +27,63 @@ class MeleeAttack(BaseAbility):
                 self.owner.velocity.update(0, 0)
 
         if state == "idle":
-            self.owner.velocity.update(1, 1)
+            if self.lock_movement:
+                self.owner.velocity.update(0, 0)
 
-    def on_state_update(self, state, delta_time):
-        if state != "active":
+    def on_update(self, delta_time):
+        if not self.is_active():
             return
-        
-        for targets in self.owner.game.get_entities_in_radius(self.owner.rect.center, self.radius):
-            if targets == self.owner or targets in self._hit_targets:
+
+        for target in self.owner.game.get_entities_in_radius(
+            self.owner.rect.center,
+            self.radius
+        ):
+            if target == self.owner or target in self._hit_targets:
                 continue
 
             if circle_overlap(
                 self.owner.rect.centerx,
                 self.owner.rect.centery,
                 self.radius,
-                targets.rect.centerx,
-                targets.rect.centery,
-                targets.core_radius
+                target.rect.centerx,
+                target.rect.centery,
+                target.core_radius
             ):
-                # Apply damage
-                targets.take_damage(self.damage)
+                # Apply damage using dealer system
+                target.take_damage(self.owner)
 
-                # Apply knockback
-                dx = targets.rect.centerx - self.owner.rect.centerx
-                dy = targets.rect.centery - self.owner.rect.centery
+                # Knockback
+                dx = target.rect.centerx - self.owner.rect.centerx
+                dy = target.rect.centery - self.owner.rect.centery
 
                 if dx == 0 and dy == 0:
                     continue
 
                 direction = normalize(dx, dy)
-                total = self.owner.rigidity + targets.rigidity
-                
+
+                owner_rigidity = self.owner.get_stat("rigidity")
+                target_rigidity = target.get_stat("rigidity")
+
+                total = owner_rigidity + target_rigidity
                 if total == 0:
                     continue
 
-                weight = self.owner.rigidity / total
+                weight = owner_rigidity / total
                 force = self.base_force * weight
-                
+
                 apply_impulse(
-                    targets,
+                    target,
                     direction[0],
                     direction[1],
                     force
                 )
 
-                targets.stun_timer = targets.stun_duration
+                # Stun scaling
+                stun = min(
+                    1,
+                    target.get_stat("stun_factor") *
+                    self.owner.get_stat("stun_strength")
+                )
+                target.stun_timer = stun
 
-                self._hit_targets.add(targets)
+                self._hit_targets.add(target)
