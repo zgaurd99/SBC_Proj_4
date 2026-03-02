@@ -1,6 +1,6 @@
 class StateMachine:
     """
-    Handles phases and states and the transition logic between these states
+    Handles phases and states and the transition logic between these states.
     """
 
     def __init__(self, initial_state):
