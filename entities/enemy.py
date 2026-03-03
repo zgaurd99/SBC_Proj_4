@@ -1,10 +1,11 @@
-from entity import Entity
+from entities.entity import Entity
 
 class Enemy(Entity):
     def __init__(self, x, y, config):
         super().__init__(x, y,config)
         self.gauge_cost = config["gauge_cost"]
         self.colour = config["colour"]
+        self.anger_value = config["gauge_cost"] 
     
     def update(self, target_rect, delta_time):
         if self.hit_timer > 0:

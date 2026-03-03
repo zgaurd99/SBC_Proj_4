@@ -1,6 +1,6 @@
 import pygame
 
-from entity import Entity
+from entities.entity import Entity
 from core.state_machine import StateMachine
 
 class Player(Entity):

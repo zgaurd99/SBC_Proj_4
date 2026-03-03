@@ -16,8 +16,8 @@ def movement_system(entity, input_vector=None, world_bounds=None, delta_time = 0
             dx /= length
             dy /= length
 
-            entity.rect.x += dx * entity.speed * entity.movement_multiplier * delta_time
-            entity.rect.y += dy * entity.speed * entity.movement_multiplier * delta_time
+            entity.rect.x += dx * entity.get_stat("speed") * delta_time
+            entity.rect.y += dy * entity.get_stat("speed") * delta_time
 
     # --- 2. Apply Velocity (Impulse / Knockback / Lunge) ---
     entity.rect.x += entity.velocity.x * delta_time

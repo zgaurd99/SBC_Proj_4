@@ -29,16 +29,16 @@ class Stats:
 class Entity_Stats_Component:
     def __init__(self, config):
         self.stats = {
-            "attack":           Stats(config["attack"]),
-            "health":           Stats(config["health"]),
-            "defense":          Stats(config["defense"]),
-            "speed":            Stats(config["speed"]),
-            "rigidity":         Stats(config["rigidity"]),
-            "attack_speed":     Stats(config["attack_speed"]),
-            "stun_factor":      Stats(config["stun_factor"]),
-            "stun_strength":    Stats(config["stun_strength"]),
-            "crit_chance":      Stats(config["crit_chance"]),
-            "crit_multiplier":  Stats(config["crit_multiplier"])
+            "attack":           Stats(config["attack"]),            # How much damage the entity deals
+            "health":           Stats(config["health"]),            # How much damage the entity can take before dying
+            "defense":          Stats(config["defense"]),           # How much the entity reduces incoming damage by
+            "speed":            Stats(config["speed"]),             # How fast the entity moves
+            "rigidity":         Stats(config["rigidity"]),          # How much the entity resists knockback and stun
+            "attack_speed":     Stats(config["attack_speed"]),      # How fast the entity attacks (affects attack cooldown)
+            "stun_factor":      Stats(config["stun_factor"]),       # How much the entity's stun duration is multiplied by when hit
+            "stun_strength":    Stats(config["stun_strength"]),     # How much the entity's stun duration is increased by when hit
+            "crit_chance":      Stats(config["crit_chance"]),       # The chance for the entity to deal a critical hit (as a decimal, e.g. 0.25 for 25%)
+            "crit_multiplier":  Stats(config["crit_multiplier"])    # How much the entity's damage is multiplied by when it lands a critical hit (e.g. 1.5 for 50% more damage)
         }
 
 class Entity:
