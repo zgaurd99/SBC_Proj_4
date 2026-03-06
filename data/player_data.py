@@ -17,7 +17,7 @@ PLAYER_DATA = {
         # 1 = health
         # 2 = defense
         # 3 = rigidity
-        "regen_time": 5,
+        "regen_time": 5.0,
         "regen_amt": 1,
     }
 }

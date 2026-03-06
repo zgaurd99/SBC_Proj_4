@@ -1,6 +1,5 @@
 from core.state_machine import StateMachine
 
-
 class BaseAbility:
     def __init__(self, owner):
         self.owner = owner

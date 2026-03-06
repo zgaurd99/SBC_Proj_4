@@ -2,6 +2,7 @@ import pygame
 
 from entities.entity import Entity
 from core.state_machine import StateMachine
+from abilities.melee_attack import MeleeAttack
 
 class Player(Entity):
     def __init__(self, x, y, config):
@@ -16,8 +17,7 @@ class Player(Entity):
 
         self.attack_machine = StateMachine("idle")
 
-        self.stun_factor = 1.0
-        self.stun_strength = 1.0
+        self.primary_attack = MeleeAttack(self)
 
     def update(self, delta_time):
         self.attack_machine.update(delta_time)

@@ -2,3 +2,5 @@ enitites.py
 game.py
 level_data.py
 test.py
+**/__pycache__/
+*.pyc
