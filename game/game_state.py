@@ -116,13 +116,17 @@ class GameState:
             2
         )
 
-        # Enemies
-        for enemy in self.spawn_manager.enemies:
-            enemy.draw(screen, self.camera)
+        # Y sorted drawing for entities
+        entities = list(self.spawn_manager.enemies) + [self.player]
+        entities.sort(key=lambda e: e.rect.bottom)
 
-        # Player
-        self.player.draw(screen, self.camera, (50, 200, 50))
+        for entity in entities:
+            if entity == self.player:
+                entity.draw(screen, self.camera, (50, 200, 50))
+            else:
+                entity.draw(screen, self.camera)
 
+        # hud
         self.hud.draw(screen, self)
 
     def _handle_enemy_death(self, enemy):
