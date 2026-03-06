@@ -11,7 +11,7 @@ def distance_sq(x1, y1, x2, y2):
 
 def normalize(dx, dy):
     """
-    normalization of diatnce
+    normalization of distance
     """
     length = math.hypot(dx, dy)
     if length == 0:

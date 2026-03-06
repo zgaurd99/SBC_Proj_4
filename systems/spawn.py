@@ -48,12 +48,13 @@ class SpawnManager:
         self._try_spawn()
 
     def _increase_gauge(self, delta_time):
+        dt_seconds = delta_time / 1000
 
         stage_scaling = 1 + (self.stage * 0.2)
 
         spawn_gain = (
             self.run_variance
-            * delta_time
+            * dt_seconds
             * self.base_rate
             * stage_scaling
         )

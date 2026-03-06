@@ -17,7 +17,11 @@ PLAYER_DATA = {
         # 1 = health
         # 2 = defense
         # 3 = rigidity
-        "regen_time": 5.0,
+        "regen_time": 5,
         "regen_amt": 1,
+        "abilities": {
+            "active": ["sword"],       # keybind triggered
+            "passive": []              # auto triggered, earned during run
+        }
     }
 }

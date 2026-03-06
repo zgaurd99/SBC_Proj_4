@@ -1,5 +1,7 @@
 import math
 
+from entities import entity
+
 def movement_system(entity, input_vector=None, world_bounds=None, delta_time = 0):
     """
     Handles movement for an entity.
@@ -24,7 +26,7 @@ def movement_system(entity, input_vector=None, world_bounds=None, delta_time = 0
     entity.rect.y += entity.velocity.y * delta_time
 
     # --- 3. Decay Velocity ---
-    entity.velocity *= entity.knockback_decay ** delta_time
+    entity.velocity *= entity.knockback_decay ** (delta_time / 1000)
 
     # --- 4. Clamp to World ---
     if world_bounds:

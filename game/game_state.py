@@ -5,7 +5,7 @@ from data.player_data import PLAYER_DATA
 from systems.spawn import SpawnManager
 from systems.movement import movement_system
 from systems.damage import damage_system
-from systems.collisison import (
+from systems.collision import (
     player_enemy_collision_system,
     enemy_enemy_collision_system
 )
@@ -77,7 +77,7 @@ class GameState:
             delta_time
         )
 
-        self.player.update(delta_time)
+        self.player.update(delta_time, self.spawn_manager.enemies)
 
         # --- Enemy AI ---
         for enemy in self.spawn_manager.enemies:
@@ -140,3 +140,10 @@ class GameState:
             self.spawn_manager.spawn_gauge += threshold * 0.5
 
             self.anger_value = overflow
+    
+    def handle_input(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:   # left click - slot 0 (sword)
+                self.player.trigger_active(0)
+            elif event.button == 3: # right click - slot 1 (bow)
+                self.player.trigger_active(1)

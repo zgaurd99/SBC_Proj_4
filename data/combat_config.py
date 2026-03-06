@@ -1,4 +1,4 @@
-MEELE_ATTACKS = {
+MELEE_ATTACKS = {
     "basic": {
         "windup_time": 0.25,
         "active_time": 0.1,

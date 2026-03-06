@@ -56,6 +56,7 @@ class Entity:
         
         self.alive = True
         self.height_offset = 0
+        self.damage_reduction = 1.0
 
         self.velocity = pygame.Vector2(0, 0)
         self.knockback_decay = 0.85

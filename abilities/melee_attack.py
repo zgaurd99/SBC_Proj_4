@@ -30,14 +30,11 @@ class MeleeAttack(BaseAbility):
             if self.lock_movement:
                 self.owner.velocity.update(0, 0)
 
-    def on_update(self, delta_time):
+    def on_update(self, delta_time, targets=None):
         if not self.is_active():
             return
 
-        for target in self.owner.game.get_entities_in_radius(
-            self.owner.rect.center,
-            self.radius
-        ):
+        for target in (targets or []):
             if target == self.owner or target in self._hit_targets:
                 continue
 
@@ -49,10 +46,8 @@ class MeleeAttack(BaseAbility):
                 target.rect.centery,
                 target.core_radius
             ):
-                # Apply damage using dealer system
                 target.take_damage(self.owner)
 
-                # Knockback
                 dx = target.rect.centerx - self.owner.rect.centerx
                 dy = target.rect.centery - self.owner.rect.centery
 
@@ -71,14 +66,8 @@ class MeleeAttack(BaseAbility):
                 weight = owner_rigidity / total
                 force = self.base_force * weight
 
-                apply_impulse(
-                    target,
-                    direction[0],
-                    direction[1],
-                    force
-                )
+                apply_impulse(target, direction[0], direction[1], force)
 
-                # Stun scaling
                 stun = min(
                     1,
                     target.get_stat("stun_factor") *
