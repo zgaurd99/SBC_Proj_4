@@ -47,6 +47,7 @@ class BaseAbility:
             return False
 
         self.machine.set_state("windup")
+        self.on_state_enter("windup")
         return True
 
     def update(self, delta_time, targets=None):

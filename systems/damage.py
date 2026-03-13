@@ -64,10 +64,10 @@ def damage_system(player, enemies, delta_time):
         We = Rp / Rt
 
         apply_impulse(player, -nx, -ny, base_force * Wp)
-        apply_impulse(enemy, nx, ny, base_force * We)
+        apply_impulse(enemy, nx, ny, base_force * We * 0.5)
 
         # --- 6. Stun Calculation (Event-Based) ---
-        base_stun = 0.1  # small contact stagger
+        base_stun = 0.4  # small contact stagger
 
         stun_duration = (
             base_stun

@@ -16,11 +16,14 @@ from ui.hud import HUD
 class GameState:
     def __init__(self, screen_width, screen_height):
 
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
         self.world_bounds = (0, 0, 2000, 1200)
 
         self.camera = Camera(
-            screen_width,
-            screen_height,
+            self.screen_width,
+            self.screen_height,
             2000,
             1200
         )
@@ -35,7 +38,9 @@ class GameState:
 
         self.spawn_manager = SpawnManager(
             self.world_bounds,
-            spawn_band=200
+            200,                    #spawn_band
+            self.screen_width,
+            self.screen_height
         )
 
         self.spawn_manager.set_stage(0)
@@ -49,7 +54,7 @@ class GameState:
         self.spawn_manager.set_anger(self.anger_value, 100)
 
         # --- Spawn ---
-        self.spawn_manager.update(delta_time)
+        self.spawn_manager.update(delta_time, self.player.rect)
         for enemy in self.spawn_manager.enemies[:]:
             if not enemy.alive:
                 self._handle_enemy_death(enemy)
@@ -76,6 +81,8 @@ class GameState:
             self.world_bounds,
             delta_time
         )
+
+        print(f"targets being passed: {len(self.spawn_manager.enemies)}")
 
         self.player.update(delta_time, self.spawn_manager.enemies)
 
@@ -125,6 +132,16 @@ class GameState:
                 entity.draw(screen, self.camera, (50, 200, 50))
             else:
                 entity.draw(screen, self.camera)
+
+        for ability in self.player.active_abilities:
+            if ability.is_active():
+                pygame.draw.circle(
+                    screen,
+                    (255, 255, 0, 128),
+                    self.camera.apply(self.player.rect).center,
+                    ability.radius,
+                    2
+                )
 
         # hud
         self.hud.draw(screen, self)

@@ -38,12 +38,13 @@ class GameLoop:
                     self.running = False
                 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:  # left click
+                    if event.button == 1:
                         self.state.handle_input(event)
-                    if event.button == 3:  # right click
+                    if event.button == 3:
                         self.state.handle_input(event)
-                        self.state.update(delta_time)
-                        self.state.draw(self.screen)
+
+            self.state.update(delta_time)
+            self.state.draw(self.screen)
 
             pygame.display.flip()
 

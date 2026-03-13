@@ -7,6 +7,8 @@ def player_enemy_collision_system(player, enemies):
     """
 
     for enemy in enemies:
+        if enemy.hit_timer > 0:
+            continue
         resolve_circle_overlap(player, enemy, weight_a=0.4, weight_b=0.6)
 
 def enemy_enemy_collision_system(enemies):
@@ -16,4 +18,7 @@ def enemy_enemy_collision_system(enemies):
 
     for i in range(len(enemies)):
         for j in range(i + 1, len(enemies)):
-            resolve_circle_overlap(enemies[i], enemies[j])
+            a, b = enemies[i], enemies[j]
+            if a.hit_timer > 0 or b.hit_timer > 0:
+                continue
+            resolve_circle_overlap(a, b)

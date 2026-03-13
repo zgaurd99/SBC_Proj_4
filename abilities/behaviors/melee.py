@@ -74,3 +74,5 @@ class MeleeBehavior(BaseAbility):
             target.stun_timer = stun
 
             self._hit_targets.add(target)
+
+            print(f"hit {target} | state: {self.machine.state} | already hit: {target in self._hit_targets}")

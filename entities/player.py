@@ -52,11 +52,13 @@ class Player(Entity):
             self.active_abilities[index].try_activate()
 
     def update(self, delta_time, targets=None):
+        dt_seconds = delta_time / 1000
+
         for ability in self.active_abilities:
-            ability.update(delta_time, targets or [])
+            ability.update(dt_seconds, targets or [])
 
         for ability in self.passive_abilities:
-            ability.update(delta_time, targets or [])
+            ability.update(dt_seconds, targets or [])
 
         self.passive_heal(delta_time)
 
@@ -65,13 +67,15 @@ class Player(Entity):
         pygame.draw.rect(screen, color, screen_rect)
 
     def passive_heal(self, delta_time):
+        dt_seconds = delta_time / 1000
+
         if self.invuln_timer > 0:
-            self.invuln_timer -= delta_time
+            self.invuln_timer -= dt_seconds
             if self.invuln_timer < 0:
                 self.invuln_timer = 0.0
 
         if self.current_health < self.get_stat("health"):
-            self.regen_timer += delta_time
+            self.regen_timer += dt_seconds
             if self.regen_timer >= self.regen_time:
                 self.heal(self.regen_amt)
                 self.regen_timer = 0.0

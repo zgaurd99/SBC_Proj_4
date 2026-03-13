@@ -22,7 +22,7 @@ ENEMY_TYPES = {
         "health": 2,
         "defense": 0.5,
         "speed": 4,
-        "rigidity": 7,
+        "rigidity": 3,
         "attack_speed": 2.0,
         "stun_factor": 2.0,
         "stun_strength": 0.5,

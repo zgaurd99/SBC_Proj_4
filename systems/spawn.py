@@ -6,15 +6,17 @@ from data.enemy_data import ENEMY_TYPES
 
 
 class SpawnManager:
-    def __init__(self, world_bounds, spawn_band=200):
+    def __init__(self, world_bounds, spawn_band, screen_width, screen_height):
         self.world_bounds = world_bounds
         self.spawn_band = spawn_band
+        self.screen_width = screen_width
+        self.screen_height = screen_height
 
-        self.spawn_gauge = 0
+        self.spawn_gauge = 1
         self.max_gauge = 10
 
         # Reduced base rate (tuned for playability)
-        self.base_rate = 0.003
+        self.base_rate = 0.5
 
         # Per-run pacing variance
         self.run_variance = random.uniform(0.9, 1.1)
@@ -33,7 +35,7 @@ class SpawnManager:
         self.enemies = []
         self.enabled = True
 
-    def update(self, delta_time):
+    def update(self, delta_time, player_rect = None):
         """
         delta_time in milliseconds
         """
@@ -45,16 +47,15 @@ class SpawnManager:
         self.time_alive += dt_seconds
 
         self._increase_gauge(delta_time)
-        self._try_spawn()
+        self._try_spawn(player_rect)
 
     def _increase_gauge(self, delta_time):
-        dt_seconds = delta_time / 1000
 
         stage_scaling = 1 + (self.stage * 0.2)
 
         spawn_gain = (
             self.run_variance
-            * dt_seconds
+            * delta_time
             * self.base_rate
             * stage_scaling
         )
@@ -67,9 +68,7 @@ class SpawnManager:
         dynamic_cap = min(dynamic_cap, self.max_cap_limit)
         return int(dynamic_cap)
 
-    def _try_spawn(self):
-
-        # Hard cap check
+    def _try_spawn(self, player_rect=None):
         if len(self.enemies) >= self._current_max_enemies():
             return
 
@@ -84,37 +83,31 @@ class SpawnManager:
         enemy_type = random.choice(affordable)
         config = ENEMY_TYPES[enemy_type]
 
-        x, y = self._get_spawn_position()
+        x, y = self._get_spawn_position(player_rect)
 
         enemy = Enemy(x, y, config)
         self.enemies.append(enemy)
-
         self.spawn_gauge -= config["gauge_cost"]
 
-    def _get_spawn_position(self):
-
+    def _get_spawn_position(self, player_rect=None):
         left, top, right, bottom = self.world_bounds
 
-        cx = (left + right) / 2
-        cy = (top + bottom) / 2
+        if player_rect:
+            cx = player_rect.centerx
+            cy = player_rect.centery
+        else:
+            cx = (left + right) / 2
+            cy = (top + bottom) / 2
 
-        outer_a = (right - left) / 2
-        outer_b = (bottom - top) / 2
-
-        inner_a = outer_a - self.spawn_band
-        inner_b = outer_b - self.spawn_band
-
-        inner_a = max(10, inner_a)
-        inner_b = max(10, inner_b)
+        rx = self.screen_width // 2 + self.spawn_band
+        ry = self.screen_height // 2 + self.spawn_band
 
         theta = random.uniform(0, 2 * math.pi)
-        t = random.uniform(0, 1)
+        x = cx + math.cos(theta) * rx
+        y = cy + math.sin(theta) * ry
 
-        a = inner_a + (outer_a - inner_a) * t
-        b = inner_b + (outer_b - inner_b) * t
-
-        x = cx + a * math.cos(theta)
-        y = cy + b * math.sin(theta)
+        x = max(left, min(x, right))
+        y = max(top, min(y, bottom))
 
         return int(x), int(y)
 

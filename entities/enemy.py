@@ -8,11 +8,13 @@ class Enemy(Entity):
         self.anger_value = config["gauge_cost"] 
     
     def update(self, target_rect, delta_time):
+        dt_seconds = delta_time / 1000
+
         if self.hit_timer > 0:
-                    self.hit_timer -= delta_time
+            self.hit_timer -= dt_seconds
 
         if self.stun_timer > 0:
-            self.stun_timer -= delta_time
+            self.stun_timer -= dt_seconds
             return
         
         dx = target_rect.centerx - self.rect.centerx
