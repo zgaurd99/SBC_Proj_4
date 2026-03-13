@@ -6,11 +6,13 @@ from data.enemy_data import ENEMY_TYPES
 
 
 class SpawnManager:
-    def __init__(self, world_bounds, spawn_band, screen_width, screen_height):
+    def __init__(self, world_bounds, spawn_band=200, virtual_h=240):
         self.world_bounds = world_bounds
         self.spawn_band = spawn_band
-        self.screen_width = screen_width
-        self.screen_height = screen_height
+        self.virtual_h = virtual_h
+
+        self.screen_width = int(virtual_h * (16/9))
+        self.screen_height = virtual_h
 
         self.spawn_gauge = 1
         self.max_gauge = 10
@@ -85,7 +87,7 @@ class SpawnManager:
 
         x, y = self._get_spawn_position(player_rect)
 
-        enemy = Enemy(x, y, config)
+        enemy = Enemy(x, y, config, virtual_h=self.virtual_h)
         self.enemies.append(enemy)
         self.spawn_gauge -= config["gauge_cost"]
 

@@ -16,31 +16,36 @@ from ui.hud import HUD
 class GameState:
     def __init__(self, screen_width, screen_height):
 
-        self.screen_width = screen_width
-        self.screen_height = screen_height
+        world_size = screen_width * 3  # square world
 
-        self.world_bounds = (0, 0, 2000, 1200)
+        self.world_bounds = (0, 0, world_size, world_size)
 
         self.camera = Camera(
-            self.screen_width,
-            self.screen_height,
-            2000,
-            1200
+            screen_width,
+            screen_height,
+            world_size,
+            world_size
         )
 
+        # Player placeholder: 5% of virtual height
+        player_size = int(screen_height * 0.05)
+
+        player_config = PLAYER_DATA["P1"].copy()
+        player_config["width"] = player_size
+        player_config["height"] = player_size
+
         self.player = Player(
-            1000,
-            600,
-            PLAYER_DATA["P1"]
+            world_size // 2,
+            world_size // 2,
+            player_config
         )
 
         self.hud = HUD(screen_width, screen_height)
 
         self.spawn_manager = SpawnManager(
             self.world_bounds,
-            200,                    #spawn_band
-            self.screen_width,
-            self.screen_height
+            spawn_band=200,
+            virtual_h=screen_height
         )
 
         self.spawn_manager.set_stage(0)
@@ -81,8 +86,6 @@ class GameState:
             self.world_bounds,
             delta_time
         )
-
-        print(f"targets being passed: {len(self.spawn_manager.enemies)}")
 
         self.player.update(delta_time, self.spawn_manager.enemies)
 

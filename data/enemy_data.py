@@ -1,7 +1,5 @@
 ENEMY_TYPES = {
     "basic": {
-        "width": 30,
-        "height": 30,
         "attack": 1,
         "health": 3,
         "defense": 1.0,
@@ -13,7 +11,11 @@ ENEMY_TYPES = {
         "crit_chance": 0.1,
         "crit_multiplier": 1.5,
         "gauge_cost": 1,
-        "colour": (200, 50, 50)
+        "colour": (200, 50, 50),
+        "animation": {
+            "sheet": "assets/enemies/brittle_archer/BrittleArcher.png",
+            "json":  "assets/enemies/brittle_archer/BrittleArcher.json"
+        }
     },
     "fast": {
         "width": 20,
@@ -21,7 +23,7 @@ ENEMY_TYPES = {
         "attack": 1,
         "health": 2,
         "defense": 0.5,
-        "speed": 4,
+        "speed": 3,
         "rigidity": 3,
         "attack_speed": 2.0,
         "stun_factor": 2.0,
