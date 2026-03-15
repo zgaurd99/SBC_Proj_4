@@ -12,7 +12,6 @@ class Enemy(Entity):
                 anim_config["sheet"],
                 anim_config["json"]
             )
-            # Scale sprite frame to virtual resolution
             base_virtual_h = 240
             sprite_scale = virtual_h / base_virtual_h
             fw, fh = self.animation.frame_size
@@ -28,6 +27,9 @@ class Enemy(Entity):
         self.colour = config["colour"]
         self.anger_value = config["gauge_cost"]
 
+        self.id: str | None = None
+        self.type_key: str | None = None
+
     def _get_anim_state(self):
         attack_speed = self.get_stat("attack_speed")
         if self.hit_timer > 0:
@@ -36,20 +38,37 @@ class Enemy(Entity):
             return "Cooldown"
         return "Waiting"
 
-    def update(self, target_rect, delta_time):
+    def update(self, target_rect, delta_time, world_bounds=None, decoy=None):
         if self.hit_timer > 0:
-            self.hit_timer -= delta_time
+            self.hit_timer -= delta_time / 1000
 
         if self.stun_timer > 0:
-            self.stun_timer -= delta_time
+            self.stun_timer -= delta_time / 1000
+
+            self.rect.x += int(self.velocity.x)
+            self.rect.y += int(self.velocity.y)
+            self.velocity *= self.knockback_decay
+
+            if world_bounds:
+                left, top, right, bottom = world_bounds
+                self.rect.x = max(left, min(self.rect.x, right - self.rect.width))
+                self.rect.y = max(top, min(self.rect.y, bottom - self.rect.height))
+
             if self.animation:
                 self.animation.set_state("Waiting")
                 self.animation.update(delta_time * 1000)
             return
 
-        dx = target_rect.centerx - self.rect.centerx
-        dy = target_rect.centery - self.rect.centery
+        target = decoy.rect if (decoy and decoy.alive) else target_rect
+
+        dx = target.centerx - self.rect.centerx
+        dy = target.centery - self.rect.centery
         self.move(dx, dy)
+
+        if world_bounds:
+            left, top, right, bottom = world_bounds
+            self.rect.x = max(left, min(self.rect.x, right - self.rect.width))
+            self.rect.y = max(top, min(self.rect.y, bottom - self.rect.height))
 
         if self.animation:
             self.animation.set_state(self._get_anim_state())

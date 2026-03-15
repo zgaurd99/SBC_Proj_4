@@ -20,8 +20,12 @@ PLAYER_DATA = {
         "regen_time": 8,
         "regen_amt": 1,
         "abilities": {
-            "active": ["sword"],       # keybind triggered
-            "passive": []              # auto triggered, earned during run
+            "active": ["sword", "decoy"],
+            "passive": [],
+            "bindings": {
+                1: 0,  # left click  -> slot 0
+                3: 1   # right click -> slot 1
+            }
         }
     }
 }

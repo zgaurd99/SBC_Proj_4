@@ -75,3 +75,7 @@ class BaseAbility:
 
     def is_busy(self):
         return self.machine.state != "idle"
+
+    def on_equip(self, context):
+        for key in getattr(self, "CONTEXT_NEEDS", []):
+            setattr(self, key, context.get(key))

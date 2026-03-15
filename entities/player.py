@@ -3,7 +3,6 @@ import pygame
 from entities.entity import Entity
 from abilities.ability_factory import AbilityFactory
 
-
 class Player(Entity):
     def __init__(self, x, y, config):
         super().__init__(x, y, config)
@@ -19,6 +18,8 @@ class Player(Entity):
         self.passive_abilities = []
 
         self._build_abilities(config.get("abilities", {}))
+
+        self.bindings = config.get("abilities", {}).get("bindings", {})
 
     def _build_abilities(self, abilities_config):
         for ability_name in abilities_config.get("active", []):

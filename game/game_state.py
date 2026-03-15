@@ -7,16 +7,18 @@ from systems.movement import movement_system
 from systems.damage import damage_system
 from systems.collision import (
     player_enemy_collision_system,
-    enemy_enemy_collision_system
+    enemy_enemy_collision_system,
+    decoy_enemy_collision_system
 )
 from core.camera import Camera
+from core.entity_registry import EntityRegistry
 from ui.hud import HUD
 
 
 class GameState:
     def __init__(self, screen_width, screen_height):
 
-        world_size = screen_width * 3  # square world
+        world_size = screen_width * 3
 
         self.world_bounds = (0, 0, world_size, world_size)
 
@@ -27,7 +29,6 @@ class GameState:
             world_size
         )
 
-        # Player placeholder: 5% of virtual height
         player_size = int(screen_height * 0.05)
 
         player_config = PLAYER_DATA["P1"].copy()
@@ -53,14 +54,33 @@ class GameState:
 
         self.anger_value = 0
 
+        self.registry = EntityRegistry()
+
+        context = {
+            "register_entity": lambda e, role=None: self.registry.register(e, role)
+        }
+
+        for ability in self.player.active_abilities:
+            ability.on_equip(context)
+
+        for ability in self.player.passive_abilities:
+            ability.on_equip(context)
+
     def update(self, delta_time):
 
         # --- Anger Simulation (temporary) ---
         self.spawn_manager.set_anger(self.anger_value, 100)
 
+        # --- Tick registered entities ---
+        self.registry.update(delta_time)
+
         # --- Spawn ---
         self.spawn_manager.update(delta_time, self.player.rect)
+
+        decoy = self.registry.get_by_role("decoy_target")
+
         for enemy in self.spawn_manager.enemies[:]:
+            enemy.update(self.player.rect, delta_time, self.world_bounds, decoy)
             if not enemy.alive:
                 self._handle_enemy_death(enemy)
                 self.spawn_manager.enemies.remove(enemy)
@@ -89,10 +109,6 @@ class GameState:
 
         self.player.update(delta_time, self.spawn_manager.enemies)
 
-        # --- Enemy AI ---
-        for enemy in self.spawn_manager.enemies:
-            enemy.update(self.player.rect, delta_time)
-
         # --- Damage ---
         damage_system(
             self.player,
@@ -110,6 +126,11 @@ class GameState:
             self.spawn_manager.enemies
         )
 
+        decoy_enemy_collision_system(
+            self.registry.get_by_role("decoy_target"),
+            self.spawn_manager.enemies
+        )
+
         # --- Camera ---
         self.camera.update(self.player.rect)
 
@@ -117,7 +138,6 @@ class GameState:
 
         screen.fill((20, 20, 20))
 
-        # World border
         world_rect = pygame.Rect(self.world_bounds)
         pygame.draw.rect(
             screen,
@@ -126,8 +146,11 @@ class GameState:
             2
         )
 
-        # Y sorted drawing for entities
-        entities = list(self.spawn_manager.enemies) + [self.player]
+        entities = (
+            list(self.spawn_manager.enemies) +
+            self.registry.all() +
+            [self.player]
+        )
         entities.sort(key=lambda e: e.rect.bottom)
 
         for entity in entities:
@@ -137,7 +160,7 @@ class GameState:
                 entity.draw(screen, self.camera)
 
         for ability in self.player.active_abilities:
-            if ability.is_active():
+            if ability.is_active() and hasattr(ability, "radius"):
                 pygame.draw.circle(
                     screen,
                     (255, 255, 0, 128),
@@ -146,28 +169,21 @@ class GameState:
                     2
                 )
 
-        # hud
         self.hud.draw(screen, self)
 
     def _handle_enemy_death(self, enemy):
 
-        # Increase anger only on kill
         self.anger_value += enemy.anger_value
 
         threshold = self.spawn_manager.anger_threshold
 
         if self.anger_value >= threshold:
-
-            # Convert anger overflow into spawn gauge
             overflow = self.anger_value - threshold
-
             self.spawn_manager.spawn_gauge += threshold * 0.5
-
             self.anger_value = overflow
-    
+
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:   # left click - slot 0 (sword)
-                self.player.trigger_active(0)
-            elif event.button == 3: # right click - slot 1 (bow)
-                self.player.trigger_active(1)
+            slot = self.player.bindings.get(event.button)
+            if slot is not None:
+                self.player.trigger_active(slot)

@@ -26,4 +26,14 @@ ABILITY_CONFIG = {
         "defense_modifier": 0.2,
         "modifier_type": "percent",
     },
+    "decoy": {
+        "behavior":       "decoy",
+        "windup_time":    0.0,
+        "active_time":    0.1,
+        "recovery_time":  0.0,
+        "cooldown_time":  8.0,
+        "spawn_radius":   60,
+        "lifetime":       5.0,
+        "health_percent": 0.3,
+    },
 }

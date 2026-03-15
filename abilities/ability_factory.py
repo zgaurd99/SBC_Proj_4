@@ -2,12 +2,14 @@ from data.ability_config import ABILITY_CONFIG
 from abilities.behaviors.melee import MeleeBehavior
 from abilities.behaviors.ranged import RangedBehavior
 from abilities.behaviors.defensive import DefensiveBehavior
+from abilities.behaviors.decoy import DecoyBehavior
 
 
 BEHAVIOR_MAP = {
-    "melee": MeleeBehavior,
-    "ranged": RangedBehavior,
+    "melee":     MeleeBehavior,
+    "ranged":    RangedBehavior,
     "defensive": DefensiveBehavior,
+    "decoy":     DecoyBehavior,
 }
 
 
