@@ -1,6 +1,6 @@
-enitites.py
-game.py
-level_data.py
-test.py
-**/__pycache__/
+# Python cache
+__pycache__/
 *.pyc
+
+# VS Code
+.vscode/
