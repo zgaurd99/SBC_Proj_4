@@ -12,10 +12,10 @@ ENEMY_TYPES = {
         "crit_multiplier": 1.5,
         "gauge_cost": 1,
         "colour": (200, 50, 50),
-        "animation": {
-            "sheet": "assets/enemies/brittle_archer/BrittleArcher.png",
-            "json":  "assets/enemies/brittle_archer/BrittleArcher.json"
-        }
+        "sprite": {
+            "sheet": "assets/enemies/Basic 4x.png",
+            "x": 70, "y": 72, "w": 70, "h": 72
+        },
     },
     "fast": {
         "width": 20,
@@ -31,7 +31,11 @@ ENEMY_TYPES = {
         "crit_chance": 0.2,
         "crit_multiplier": 1.25,
         "gauge_cost": 2,
-        "colour": (200, 50, 50)
+        "colour": (200, 50, 50),
+        "sprite": {
+            "sheet": "assets/enemies/Basic Undead 4x.png",
+            "x": 210, "y": 144, "w": 70, "h": 72
+        },
     },
     "tank": {
         "width": 45,
@@ -47,6 +51,10 @@ ENEMY_TYPES = {
         "crit_chance": 0.5,
         "crit_multiplier": 1.75,
         "gauge_cost": 3,
-        "colour": (200, 50, 50)
+        "colour": (200, 50, 50),
+        "sprite": {
+            "sheet": "assets/enemies/Basic 4x.png",
+            "x": 280, "y": 0, "w": 70, "h": 72
+        },
     }
 }

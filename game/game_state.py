@@ -130,7 +130,7 @@ class GameState:
                 entity.draw(screen, self.camera)
 
         for ability in self.player.active_abilities:
-            if ability.is_active():
+            if ability.is_active() and hasattr(ability, "radius"):
                 pygame.draw.circle(
                     screen,
                     (255, 255, 0, 128),

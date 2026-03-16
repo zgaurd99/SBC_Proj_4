@@ -160,10 +160,10 @@ class SpawnManager:
             return
 
         x, y = position
-        enemy = Enemy(x, y, config, virtual_h=self.virtual_h)
+        enemy = Enemy(x, y, config)
         self._id_counter += 1
         enemy.type_key = enemy_type
-        enemy.id = f"{enemy_type}-{hex(self._id_counter)}"
+        enemy.enemy_id = f"{enemy_type}-{hex(self._id_counter)}"
         self.enemies.append(enemy)
         self.spawn_gauge -= config["gauge_cost"]
         self.queue.popleft()
