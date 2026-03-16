@@ -17,18 +17,18 @@ class Player(Entity):
         self.active_abilities = []
         self.passive_abilities = []
 
-        self._build_abilities(config.get("abilities", {}))
+        self._build_abilities(config.get("abilities", {}), config.get("screen_height", 270))
 
         self.bindings = config.get("abilities", {}).get("bindings", {})
 
-    def _build_abilities(self, abilities_config):
+    def _build_abilities(self, abilities_config, screen_height=270):
         for ability_name in abilities_config.get("active", []):
-            ability = AbilityFactory.build(self, ability_name)
+            ability = AbilityFactory.build(self, ability_name, screen_height)
             if ability:
                 self.active_abilities.append(ability)
 
         for ability_name in abilities_config.get("passive", []):
-            ability = AbilityFactory.build(self, ability_name)
+            ability = AbilityFactory.build(self, ability_name, screen_height)
             if ability:
                 self.passive_abilities.append(ability)
                 if hasattr(ability, "apply_passive"):

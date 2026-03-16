@@ -12,10 +12,11 @@ BEHAVIOR_MAP = {
     "decoy":     DecoyBehavior,
 }
 
+BASE_HEIGHT = 270
 
 class AbilityFactory:
     @staticmethod
-    def build(owner, ability_name):
+    def build(owner, ability_name, screen_height=270):
         config = ABILITY_CONFIG.get(ability_name)
 
         if config is None:
@@ -34,4 +35,11 @@ class AbilityFactory:
             print(f"[AbilityFactory] Unknown behavior: '{behavior_key}' for ability '{ability_name}'")
             return None
 
-        return behavior_class(owner, config)
+        scale = screen_height / BASE_HEIGHT
+
+        scaled_config = config.copy()
+        for key in ("radius", "base_force"):
+            if key in scaled_config:
+                scaled_config[key] = scaled_config[key] * scale
+
+        return behavior_class(owner, scaled_config)

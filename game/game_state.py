@@ -7,16 +7,16 @@ from systems.movement import movement_system
 from systems.damage import damage_system
 from systems.collision import (
     player_enemy_collision_system,
-    enemy_enemy_collision_system,
-    decoy_enemy_collision_system
+    enemy_enemy_collision_system
 )
 from core.camera import Camera
-from core.entity_registry import EntityRegistry
 from ui.hud import HUD
 
 
 class GameState:
-    def __init__(self, screen_width, screen_height):
+    def __init__(self, screen_width, screen_height, assets):
+
+        self.assets = assets
 
         world_size = screen_width * 3
 
@@ -34,6 +34,7 @@ class GameState:
         player_config = PLAYER_DATA["P1"].copy()
         player_config["width"] = player_size
         player_config["height"] = player_size
+        player_config["screen_height"] = screen_height
 
         self.player = Player(
             world_size // 2,
@@ -54,38 +55,16 @@ class GameState:
 
         self.anger_value = 0
 
-        self.registry = EntityRegistry()
-
-        context = {
-            "register_entity": lambda e, role=None: self.registry.register(e, role)
-        }
-
-        for ability in self.player.active_abilities:
-            ability.on_equip(context)
-
-        for ability in self.player.passive_abilities:
-            ability.on_equip(context)
-
     def update(self, delta_time):
 
-        # --- Anger Simulation (temporary) ---
         self.spawn_manager.set_anger(self.anger_value, 100)
 
-        # --- Tick registered entities ---
-        self.registry.update(delta_time)
-
-        # --- Spawn ---
         self.spawn_manager.update(delta_time, self.player.rect)
-
-        decoy = self.registry.get_by_role("decoy_target")
-
         for enemy in self.spawn_manager.enemies[:]:
-            enemy.update(self.player.rect, delta_time, self.world_bounds, decoy)
             if not enemy.alive:
                 self._handle_enemy_death(enemy)
                 self.spawn_manager.enemies.remove(enemy)
 
-        # --- Input Movement ---
         keys = pygame.key.get_pressed()
 
         dx = 0
@@ -109,14 +88,15 @@ class GameState:
 
         self.player.update(delta_time, self.spawn_manager.enemies)
 
-        # --- Damage ---
+        for enemy in self.spawn_manager.enemies:
+            enemy.update(self.player.rect, delta_time)
+
         damage_system(
             self.player,
             self.spawn_manager.enemies,
             delta_time
         )
 
-        # --- Collision ---
         player_enemy_collision_system(
             self.player,
             self.spawn_manager.enemies
@@ -126,12 +106,6 @@ class GameState:
             self.spawn_manager.enemies
         )
 
-        decoy_enemy_collision_system(
-            self.registry.get_by_role("decoy_target"),
-            self.spawn_manager.enemies
-        )
-
-        # --- Camera ---
         self.camera.update(self.player.rect)
 
     def draw(self, screen):
@@ -146,11 +120,7 @@ class GameState:
             2
         )
 
-        entities = (
-            list(self.spawn_manager.enemies) +
-            self.registry.all() +
-            [self.player]
-        )
+        entities = list(self.spawn_manager.enemies) + [self.player]
         entities.sort(key=lambda e: e.rect.bottom)
 
         for entity in entities:
@@ -160,7 +130,7 @@ class GameState:
                 entity.draw(screen, self.camera)
 
         for ability in self.player.active_abilities:
-            if ability.is_active() and hasattr(ability, "radius"):
+            if ability.is_active():
                 pygame.draw.circle(
                     screen,
                     (255, 255, 0, 128),
@@ -178,12 +148,14 @@ class GameState:
         threshold = self.spawn_manager.anger_threshold
 
         if self.anger_value >= threshold:
+
             overflow = self.anger_value - threshold
             self.spawn_manager.spawn_gauge += threshold * 0.5
             self.anger_value = overflow
 
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            slot = self.player.bindings.get(event.button)
-            if slot is not None:
-                self.player.trigger_active(slot)
+            if event.button == 1:
+                self.player.trigger_active(0)
+            elif event.button == 3:
+                self.player.trigger_active(1)
