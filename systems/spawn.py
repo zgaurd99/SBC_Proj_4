@@ -150,7 +150,8 @@ class SpawnManager:
             return
 
         enemy_type = self.queue[0]
-        config     = ENEMY_TYPES[enemy_type]
+        config     = ENEMY_TYPES[enemy_type].copy()
+        config["screen_height"] = self.virtual_h
 
         if self.spawn_gauge < config["gauge_cost"]:
             return

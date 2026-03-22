@@ -20,6 +20,8 @@ class Enemy(Entity):
             ))
         else:
             self.sprite = None
+        self.draw_scale = config.get("draw_scale", 0.08)
+        self.screen_height = config.get("screen_height", 270)
 
     def update(self, target_rect, delta_time):
         if self.hit_timer > 0:
@@ -36,4 +38,17 @@ class Enemy(Entity):
     def draw(self, screen, camera, color=None):
         if color is None:
             color = self.colour
-        super().draw(screen, camera, color)
+
+        render_rect = self.rect.copy()
+        render_rect.y -= self.height_offset
+        screen_rect = camera.apply(render_rect)
+
+        if self.sprite:
+            pixel_size = int(self.screen_height * self.draw_scale)
+            scaled = pygame.transform.scale(self.sprite, (pixel_size, pixel_size))
+            # Centre the sprite on the entity's screen rect
+            draw_x = screen_rect.centerx - pixel_size // 2
+            draw_y = screen_rect.centery - pixel_size // 2
+            screen.blit(scaled, (draw_x, draw_y))
+        else:
+            pygame.draw.rect(screen, color, screen_rect)

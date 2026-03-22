@@ -49,8 +49,6 @@ class AssetLoader:
             surface = pygame.image.load(buffer, "_.png").convert_alpha()
             self.surfaces[key] = surface
 
-            print(f"[AssetLoader] Loaded '{key}' from '{path}' at {width}x{height}")
-
     def get(self, name: str) -> pygame.Surface | None:
         surface = self.surfaces.get(name)
         if surface is None:

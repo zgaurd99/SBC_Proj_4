@@ -14,9 +14,10 @@ from ui.hud import HUD
 
 
 class GameState:
-    def __init__(self, screen_width, screen_height, assets):
+    def __init__(self, screen_width, screen_height, assets, on_game_over=None):
 
         self.assets = assets
+        self.on_game_over = on_game_over
 
         world_size = screen_width * 3
 
@@ -42,6 +43,12 @@ class GameState:
             player_config
         )
 
+        # Wire register_entity into any ability that needs it
+        self.decoys = []
+        for ability in self.player.active_abilities:
+            if hasattr(ability, "register_entity"):
+                ability.register_entity = self._register_entity
+
         self.hud = HUD(screen_width, screen_height)
 
         self.spawn_manager = SpawnManager(
@@ -54,6 +61,10 @@ class GameState:
         self.spawn_manager.set_anger(0, 100)
 
         self.anger_value = 0
+
+    def _register_entity(self, entity, role=None):
+        if role == "decoy_target":
+            self.decoys.append(entity)
 
     def update(self, delta_time):
 
@@ -88,8 +99,21 @@ class GameState:
 
         self.player.update(delta_time, self.spawn_manager.enemies)
 
+        # Update decoys, cull dead ones
+        for decoy in self.decoys[:]:
+            decoy.update(delta_time)
+            if not decoy.alive:
+                self.decoys.remove(decoy)
+
         for enemy in self.spawn_manager.enemies:
             enemy.update(self.player.rect, delta_time)
+
+        for enemy in self.spawn_manager.enemies:
+            if hasattr(enemy, "projectiles"):
+                for proj in enemy.projectiles[:]:
+                    proj.update(delta_time, [self.player])
+                    if not proj.alive:
+                        enemy.projectiles.remove(proj)
 
         damage_system(
             self.player,
@@ -120,7 +144,7 @@ class GameState:
             2
         )
 
-        entities = list(self.spawn_manager.enemies) + [self.player]
+        entities = list(self.spawn_manager.enemies) + self.decoys + [self.player]
         entities.sort(key=lambda e: e.rect.bottom)
 
         for entity in entities:

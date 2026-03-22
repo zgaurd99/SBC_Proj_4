@@ -9,6 +9,7 @@ from game.game_state import GameState
 from game.menu_state import MenuState
 from core.asset_loader import AssetLoader
 from data.ui_config import UI_MANIFEST
+from game.game_over_state import GameOverState
 
 RESOLUTIONS = [
     (1280, 720),
@@ -52,7 +53,29 @@ class GameLoop:
         self.clock = pygame.time.Clock()
 
         self.assets = AssetLoader(UI_MANIFEST)
+        self.running = True
 
+        self._to_menu()
+
+    def _start_game(self):
+        self.current_state = GameState(
+            self.screen_w,
+            self.screen_h,
+            self.assets,
+            on_game_over=self._game_over
+        )
+
+    def _game_over(self, time_survived, enemies_killed):
+        self.current_state = GameOverState(
+            self.screen_w,
+            self.screen_h,
+            self.assets,
+            time_survived,
+            enemies_killed,
+            on_restart=self._to_menu
+        )
+
+    def _to_menu(self):
         self.current_state = MenuState(
             self.screen_w,
             self.screen_h,
@@ -61,15 +84,6 @@ class GameLoop:
             offset_x=self.offset_x,
             offset_y=self.offset_y,
             int_scale=1
-        )
-
-        self.running = True
-
-    def _start_game(self):
-        self.current_state = GameState(
-            self.screen_w,
-            self.screen_h,
-            self.assets
         )
 
     def run(self):

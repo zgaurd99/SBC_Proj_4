@@ -4,7 +4,7 @@ ENEMY_TYPES = {
         "health": 3,
         "defense": 1.0,
         "speed": 2,
-        "rigidity": 5,
+        "rigidity": 10,
         "attack_speed": 1.0,
         "stun_factor": 1.0,
         "stun_strength": 1.0,
@@ -16,6 +16,7 @@ ENEMY_TYPES = {
             "sheet": "assets/enemies/Basic 4x.png",
             "x": 70, "y": 72, "w": 70, "h": 72
         },
+        "draw_scale": 0.08,
     },
     "fast": {
         "width": 20,
@@ -24,7 +25,7 @@ ENEMY_TYPES = {
         "health": 2,
         "defense": 0.5,
         "speed": 3,
-        "rigidity": 3,
+        "rigidity": 5,
         "attack_speed": 2.0,
         "stun_factor": 2.0,
         "stun_strength": 0.5,
@@ -36,6 +37,7 @@ ENEMY_TYPES = {
             "sheet": "assets/enemies/Basic Undead 4x.png",
             "x": 210, "y": 144, "w": 70, "h": 72
         },
+        "draw_scale": 0.06,
     },
     "tank": {
         "width": 45,
@@ -44,7 +46,7 @@ ENEMY_TYPES = {
         "health": 5,
         "defense": 1.5,
         "speed": 1,
-        "rigidity": 7,
+        "rigidity": 15,
         "attack_speed": 0.5,
         "stun_factor": 0.5,
         "stun_strength": 2.0,
@@ -53,8 +55,34 @@ ENEMY_TYPES = {
         "gauge_cost": 3,
         "colour": (200, 50, 50),
         "sprite": {
+            "sheet": "assets/enemies/Basic Undead 4x.png",
+            "x": 290, "y": 72, "w": 60, "h": 72
+        },
+        "draw_scale": 0.12,
+    },
+    "archer": {
+        "width": 25,
+        "height": 25,
+        "attack": 2,
+        "health": 2,
+        "defense": 0.8,
+        "speed": 1.2,
+        "rigidity": 5,
+        "attack_speed": 2.0,
+        "stun_factor": 1.0,
+        "stun_strength": 0.5,
+        "crit_chance": 0.1,
+        "crit_multiplier": 1.5,
+        "gauge_cost": 2,
+        "colour": (180, 100, 50),
+        "sprite": {
             "sheet": "assets/enemies/Basic 4x.png",
             "x": 280, "y": 0, "w": 70, "h": 72
         },
-    }
+        "attack_range": 400,
+        "projectile_speed": 120,
+        "projectile_width": 6,
+        "projectile_height": 6,
+        "max_distance": 300,
+    },
 }
