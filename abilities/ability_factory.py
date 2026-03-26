@@ -38,8 +38,10 @@ class AbilityFactory:
         scale = screen_height / BASE_HEIGHT
 
         scaled_config = config.copy()
-        for key in ("radius", "base_force"):
+        for key in ("radius", "base_force", "spawn_radius"):
             if key in scaled_config:
                 scaled_config[key] = scaled_config[key] * scale
+
+        scaled_config["screen_height"] = screen_height
 
         return behavior_class(owner, scaled_config)

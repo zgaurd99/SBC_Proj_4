@@ -1,9 +1,10 @@
 import pygame
+import math
 from core.physics import circle_overlap, normalize
 
 
 class Projectile:
-    def __init__(self, x, y, dx, dy, config, on_hit, owner):
+    def __init__(self, x, y, dx, dy, config, on_hit, owner, sprite=None):
         self.rect = pygame.Rect(x, y, config["width"], config["height"])
         self.owner = owner
         self.on_hit = on_hit
@@ -17,6 +18,12 @@ class Projectile:
 
         self.distance_travelled = 0.0
         self.alive = True
+
+        if sprite:
+            angle = -math.degrees(math.atan2(ny, nx)) - 45
+            self.sprite = pygame.transform.rotate(sprite, angle)
+        else:
+            self.sprite = None
 
     def update(self, delta_time, targets):
         if not self.alive:
@@ -50,9 +57,15 @@ class Projectile:
                 return
 
     def draw(self, screen, camera):
-        pygame.draw.circle(
-            screen,
-            (255, 255, 100),
-            camera.apply(self.rect).center,
-            self.core_radius
-        )
+        screen_pos = camera.apply(self.rect)
+
+        if self.sprite:
+            draw_rect = self.sprite.get_rect(center=screen_pos.center)
+            screen.blit(self.sprite, draw_rect)
+        else:
+            pygame.draw.circle(
+                screen,
+                (255, 255, 100),
+                screen_pos.center,
+                self.core_radius
+            )

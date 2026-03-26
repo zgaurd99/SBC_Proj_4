@@ -7,11 +7,11 @@ from systems.movement import movement_system
 from systems.damage import damage_system
 from systems.collision import (
     player_enemy_collision_system,
-    enemy_enemy_collision_system
+    enemy_enemy_collision_system,
+    decoy_enemy_collision_system
 )
 from core.camera import Camera
 from ui.hud import HUD
-
 
 class GameState:
     def __init__(self, screen_width, screen_height, assets, on_game_over=None):
@@ -105,8 +105,13 @@ class GameState:
             if not decoy.alive:
                 self.decoys.remove(decoy)
 
+        # Resolve highest priority live target
+        active_decoy = next((d for d in self.decoys if d.alive), None)
+        decoy_rect = active_decoy.rect if active_decoy else None
+
         for enemy in self.spawn_manager.enemies:
-            enemy.update(self.player.rect, delta_time)
+            target_rect = decoy_rect if (enemy.follow_decoy and decoy_rect) else self.player.rect
+            enemy.update(target_rect, delta_time)
 
         for enemy in self.spawn_manager.enemies:
             if hasattr(enemy, "projectiles"):
@@ -130,6 +135,9 @@ class GameState:
             self.spawn_manager.enemies
         )
 
+        for decoy in self.decoys:
+            decoy_enemy_collision_system(decoy, self.spawn_manager.enemies)
+
         self.camera.update(self.player.rect)
 
     def draw(self, screen):
@@ -152,6 +160,11 @@ class GameState:
                 entity.draw(screen, self.camera, (50, 200, 50))
             else:
                 entity.draw(screen, self.camera)
+
+        for enemy in self.spawn_manager.enemies:
+            if hasattr(enemy, "projectiles"):
+                for proj in enemy.projectiles:
+                    proj.draw(screen, self.camera)
 
         for ability in self.player.active_abilities:
             if ability.is_active() and hasattr(ability, "radius"):

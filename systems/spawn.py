@@ -4,12 +4,17 @@ from collections import deque
 
 from entities.enemy import Enemy
 from data.enemy_data import ENEMY_TYPES
-
+from entities.archer_enemy import ArcherEnemy
 
 BASE_CAPS = {
     "basic": 6,
     "fast":  4,
     "tank":  2,
+    "archer": 3,
+}
+
+ENEMY_CLASS_MAP = {
+    "archer": ArcherEnemy,
 }
 
 MAX_SPAWN_RETRIES = 10
@@ -161,7 +166,8 @@ class SpawnManager:
             return
 
         x, y = position
-        enemy = Enemy(x, y, config)
+        enemy_class = ENEMY_CLASS_MAP.get(enemy_type, Enemy)
+        enemy = enemy_class(x, y, config)
         self._id_counter += 1
         enemy.type_key = enemy_type
         enemy.enemy_id = f"{enemy_type}-{hex(self._id_counter)}"

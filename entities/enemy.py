@@ -22,6 +22,7 @@ class Enemy(Entity):
             self.sprite = None
         self.draw_scale = config.get("draw_scale", 0.08)
         self.screen_height = config.get("screen_height", 270)
+        self.follow_decoy = config.get("follow_decoy", True)
 
     def update(self, target_rect, delta_time):
         if self.hit_timer > 0:

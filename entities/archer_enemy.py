@@ -19,6 +19,10 @@ class ArcherEnemy(Enemy):
 
         self.projectiles = []
 
+        raw = pygame.image.load("assets/enemies/brittle_archer/arrow.png").convert_alpha()
+        size = config.get("projectile_width", 6)
+        self.arrow_sprite = pygame.transform.scale(raw, (size * 2, size * 2))
+
     def update(self, target_rect, delta_time):
         dt_seconds = delta_time / 1000
 
@@ -49,7 +53,8 @@ class ArcherEnemy(Enemy):
             dx, dy,
             self._projectile_config,
             on_hit=self._on_projectile_hit,
-            owner=self
+            owner=self,
+            sprite=self.arrow_sprite
         )
         self.projectiles.append(proj)
 

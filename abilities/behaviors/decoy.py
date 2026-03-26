@@ -18,6 +18,7 @@ class DecoyBehavior(BaseAbility):
         self.spawn_radius   = config.get("spawn_radius",   60)
         self.lifetime       = config.get("lifetime",       5.0)
         self.health_percent = config.get("health_percent", 0.3)
+        self.screen_height  = config.get("screen_height",  270)
 
         self.register_entity = None
         self._spawned = False
@@ -34,15 +35,17 @@ class DecoyBehavior(BaseAbility):
         x = self.owner.rect.centerx + math.cos(angle) * self.spawn_radius
         y = self.owner.rect.centery + math.sin(angle) * self.spawn_radius
 
+        size = int(self.screen_height * 0.05)
+
         decoy = Decoy(
             int(x), int(y),
             owner=self.owner,
+            size=size,
             health_percent=self.health_percent,
             lifetime=self.lifetime
         )
 
         if self.register_entity:
-            print(f"[Decoy] spawning, register_entity is {self.register_entity}")
             self.register_entity(decoy, role="decoy_target")
 
         self._spawned = True

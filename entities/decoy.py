@@ -1,8 +1,6 @@
 from entities.entity import Entity
 
 DECOY_CONFIG = {
-    "width":          10,
-    "height":         10,
     "defense":        1.0,
     "attack":         0,
     "attack_speed":   1.0,
@@ -15,9 +13,11 @@ DECOY_CONFIG = {
 }
 
 class Decoy(Entity):
-    def __init__(self, x, y, owner, health_percent=0.3, lifetime=5.0):
+    def __init__(self, x, y, owner, size, health_percent=0.3, lifetime=5.0):
         config = DECOY_CONFIG.copy()
         config["health"] = max(1, owner.get_stat("health") * health_percent)
+        config["width"]  = size
+        config["height"] = size
 
         super().__init__(x, y, config)
         self.lifetime = lifetime
