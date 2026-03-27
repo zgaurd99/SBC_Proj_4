@@ -27,7 +27,7 @@ class DecoyBehavior(BaseAbility):
         if state == "windup":
             self._spawned = False
 
-    def on_update(self, delta_time, targets=None):
+    def on_update(self, delta_time, targets=None, mouse_world_pos=None):
         if not self.is_active() or self._spawned:
             return
 

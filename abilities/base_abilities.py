@@ -50,7 +50,7 @@ class BaseAbility:
         self.on_state_enter("windup")
         return True
 
-    def update(self, delta_time, targets=None):
+    def update(self, delta_time, targets=None, mouse_world_pos=None):
         previous_state = self.machine.state
 
         self.machine.update(delta_time)
@@ -60,9 +60,9 @@ class BaseAbility:
         if previous_state != current_state:
             self.on_state_enter(current_state)
 
-        self.on_update(delta_time, targets or [])
+        self.on_update(delta_time, targets or [], mouse_world_pos)
         
-    def on_update(self, delta_time, targets=None):
+    def on_update(self, delta_time, targets=None, mouse_world_pos=None):
         """Override in subclasses"""
         pass
 

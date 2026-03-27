@@ -6,6 +6,7 @@ ABILITY_CONFIG = {
         "recovery_time": 0.25,
         "cooldown_time": 0.2,
         "radius": 60,
+        "arc_angle": 60,
         "damage": 3,
         "base_force": 35,
         "lock_movement": True,

@@ -1,4 +1,5 @@
 import pygame
+import math
 
 from entities.player import Player
 from data.player_data import PLAYER_DATA
@@ -12,6 +13,7 @@ from systems.collision import (
 )
 from core.camera import Camera
 from ui.hud import HUD
+from game.world_render import WorldRenderer
 
 class GameState:
     def __init__(self, screen_width, screen_height, assets, on_game_over=None):
@@ -21,7 +23,18 @@ class GameState:
 
         world_size = screen_width * 3
 
-        self.world_bounds = (0, 0, world_size, world_size)
+        TREE_ROWS = 3
+        TREE_H = 80  # updated from 40
+        treeline_depth = TREE_ROWS * TREE_H
+
+        self.world_renderer = WorldRenderer(world_size)
+
+        self.world_bounds = (
+            treeline_depth,
+            treeline_depth,
+            world_size - treeline_depth,
+            world_size - treeline_depth
+        )
 
         self.camera = Camera(
             screen_width,
@@ -97,7 +110,13 @@ class GameState:
             delta_time
         )
 
-        self.player.update(delta_time, self.spawn_manager.enemies)
+        mx, my = pygame.mouse.get_pos()
+        mouse_world_pos = (
+            mx + self.camera.x,
+            my + self.camera.y
+        )
+
+        self.player.update(delta_time, self.spawn_manager.enemies, mouse_world_pos)
 
         # Update decoys, cull dead ones
         for decoy in self.decoys[:]:
@@ -142,15 +161,8 @@ class GameState:
 
     def draw(self, screen):
 
-        screen.fill((20, 20, 20))
-
-        world_rect = pygame.Rect(self.world_bounds)
-        pygame.draw.rect(
-            screen,
-            (50, 50, 50),
-            self.camera.apply(world_rect),
-            2
-        )
+        screen.fill((0, 0, 0))  # letterbox colour outside world
+        self.world_renderer.draw(screen, self.camera)
 
         entities = list(self.spawn_manager.enemies) + self.decoys + [self.player]
         entities.sort(key=lambda e: e.rect.bottom)
@@ -168,13 +180,29 @@ class GameState:
 
         for ability in self.player.active_abilities:
             if ability.is_active() and hasattr(ability, "radius"):
-                pygame.draw.circle(
-                    screen,
-                    (255, 255, 0, 128),
-                    self.camera.apply(self.player.rect).center,
-                    ability.radius,
-                    2
-                )
+                center = self.camera.apply(self.player.rect).center
+
+                if hasattr(ability, "swing_direction"):
+                    # Draw arc wedge
+                    dx, dy      = ability.swing_direction
+                    half_rad    = math.radians(ability.arc_angle)
+                    base_angle  = math.atan2(dy, dx)
+                    start_angle = base_angle - half_rad
+                    end_angle   = base_angle + half_rad
+
+                    points = [center]
+                    steps  = 20
+                    for i in range(steps + 1):
+                        t     = i / steps
+                        angle = start_angle + t * (end_angle - start_angle)
+                        px    = center[0] + math.cos(angle) * ability.radius
+                        py    = center[1] + math.sin(angle) * ability.radius
+                        points.append((px, py))
+
+                    if len(points) >= 3:
+                        pygame.draw.polygon(screen, (255, 255, 0, 60), points, 2)
+                else:
+                    pygame.draw.circle(screen, (255, 255, 0, 128), center, ability.radius, 2)
 
         self.hud.draw(screen, self)
 

@@ -52,11 +52,11 @@ class Player(Entity):
         if index < len(self.active_abilities):
             self.active_abilities[index].try_activate()
 
-    def update(self, delta_time, targets=None):
+    def update(self, delta_time, targets=None, mouse_world_pos=None):
         dt_seconds = delta_time / 1000
 
         for ability in self.active_abilities:
-            ability.update(dt_seconds, targets or [])
+            ability.update(dt_seconds, targets or [], mouse_world_pos)
 
         for ability in self.passive_abilities:
             ability.update(dt_seconds, targets or [])
