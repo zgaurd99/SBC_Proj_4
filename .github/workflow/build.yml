@@ -2,7 +2,8 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    tags:
+      - "v*"
 
 jobs:
   build-windows:
@@ -23,11 +24,13 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller SBC_Proj_4.spec
 
-      - name: Upload Windows build
-        uses: actions/upload-artifact@v4
+      - name: Zip build
+        run: Compress-Archive -Path dist/SBC_Proj_4/* -DestinationPath SBC_Proj_4-windows.zip
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
         with:
-          name: SBC_Proj_4-windows
-          path: dist/SBC_Proj_4/
+          files: SBC_Proj_4-windows.zip
 
   build-linux:
     runs-on: ubuntu-latest
@@ -52,8 +55,10 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller SBC_Proj_4.spec
 
-      - name: Upload Linux build
-        uses: actions/upload-artifact@v4
+      - name: Zip build
+        run: zip -r SBC_Proj_4-linux.zip dist/SBC_Proj_4/
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
         with:
-          name: SBC_Proj_4-linux
-          path: dist/SBC_Proj_4/
+          files: SBC_Proj_4-linux.zip
