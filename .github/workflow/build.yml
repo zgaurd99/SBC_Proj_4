@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller SBC_Proj_4.spec
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: SBC_Proj_4-windows
+          path: dist/SBC_Proj_4/
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2-dev libgirepository1.0-dev pkg-config python3-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller SBC_Proj_4.spec
+
+      - name: Upload Linux build
+        uses: actions/upload-artifact@v4
+        with:
+          name: SBC_Proj_4-linux
+          path: dist/SBC_Proj_4/
